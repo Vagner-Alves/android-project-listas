@@ -1,47 +1,51 @@
 package com.example.android_study
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.android_study.ui.theme.AndroidstudyTheme
+import android.widget.Button
+import android.widget.EditText
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var taskAdapter: TaskAdapter
+    private var taskList = mutableListOf<Task>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            AndroidstudyTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+        setContentView(R.layout.activity_main)
+
+        val recyclerView: RecyclerView = findViewById(R.id.task_recycler_view)
+        val taskInput: EditText = findViewById(R.id.task_input)
+        val addButton: Button = findViewById(R.id.add_button)
+
+        taskAdapter = TaskAdapter(
+            onTaskClicked = { task ->
+                val updatedTask = task.copy(isCompleted = !task.isCompleted)
+                val index = taskList.indexOfFirst { it.id == task.id }
+                if (index != -1) {
+                    taskList[index] = updatedTask
+                    taskAdapter.submitList(taskList.toList())
                 }
+            },
+            onDeleteClicked = { task ->
+                taskList.remove(task)
+                taskAdapter.submitList(taskList.toList())
+            }
+        )
+
+        recyclerView.adapter = taskAdapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        addButton.setOnClickListener {
+            val title = taskInput.text.toString()
+            if (title.isNotEmpty()) {
+                val newTask = Task(title = title)
+                taskList.add(newTask)
+                taskAdapter.submitList(taskList.toList())
+                taskInput.text.clear()
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AndroidstudyTheme {
-        Greeting("Android")
     }
 }
