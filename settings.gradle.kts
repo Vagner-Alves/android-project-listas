@@ -21,4 +21,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "android-study"
 include(":app")
- 
