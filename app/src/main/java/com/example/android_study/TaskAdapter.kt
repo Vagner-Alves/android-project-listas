@@ -1,10 +1,10 @@
 package com.example.android_study
 
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.ImageButton
+import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -16,7 +16,8 @@ class TaskAdapter(
 ) : ListAdapter<Task, TaskAdapter.TaskViewHolder>(TaskDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.task_item, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.task_item, parent, false)
         return TaskViewHolder(view)
     }
 
@@ -26,16 +27,19 @@ class TaskAdapter(
     }
 
     class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val titleTextView: TextView = itemView.findViewById(R.id.task_title)
-        private val completedCheckBox: CheckBox = itemView.findViewById(R.id.task_checkbox)
-        private val deleteButton: ImageButton = itemView.findViewById(R.id.delete_button)
+        private val taskTitle: TextView = itemView.findViewById(R.id.task_title)
+        private val deleteButton: Button = itemView.findViewById(R.id.delete_button)
 
         fun bind(task: Task, onTaskClicked: (Task) -> Unit, onDeleteClicked: (Task) -> Unit) {
-            titleTextView.text = task.title
-            completedCheckBox.isChecked = task.isCompleted
-
-            completedCheckBox.setOnClickListener { onTaskClicked(task) }
+            taskTitle.text = task.title
+            itemView.setOnClickListener { onTaskClicked(task) }
             deleteButton.setOnClickListener { onDeleteClicked(task) }
+
+            if (task.isCompleted) {
+                taskTitle.paintFlags = taskTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+            } else {
+                taskTitle.paintFlags = taskTitle.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+            }
         }
     }
 
