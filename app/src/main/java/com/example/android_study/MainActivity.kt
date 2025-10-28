@@ -2,7 +2,6 @@ package com.example.android_study
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Base64
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
@@ -60,10 +59,7 @@ class MainActivity : AppCompatActivity() {
     private fun saveTasks() {
         val sharedPreferences = getSharedPreferences("tasks", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        val taskSet = tasks.map {
-            val encodedTitle = Base64.encodeToString(it.title.toByteArray(), Base64.NO_WRAP)
-            "${it.id};$encodedTitle;${it.isCompleted}"
-        }.toSet()
+        val taskSet = tasks.map { "${it.id};${it.title};${it.isCompleted}" }.toSet()
         editor.putStringSet("task_list", taskSet)
         editor.apply()
     }
@@ -77,8 +73,7 @@ class MainActivity : AppCompatActivity() {
                 try {
                     val parts = it.split(";", limit = 3)
                     if (parts.size == 3) {
-                        val title = String(Base64.decode(parts[1], Base64.NO_WRAP))
-                        Task(id = parts[0].toLong(), title = title, isCompleted = parts[2].toBoolean())
+                        Task(id = parts[0].toLong(), title = parts[1], isCompleted = parts[2].toBoolean())
                     } else {
                         null
                     }
